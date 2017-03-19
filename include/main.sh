@@ -3,7 +3,7 @@
 . "$INCLUDE"/https.sh
 
 ######################################################""
-############# DO NOT UPDATE 
+############# DO NOT UPDATE
 ######################################################""
 users="htpasswd.txt"
 
@@ -18,8 +18,8 @@ if [ ${here:0:3} = "/C/" ]; then
  seedboxFiles=/c${seedboxFiles:2}
 fi
 
-echo $seedboxFiles
-echo $here
+echo "New folders will be created in $seedboxFiles"
+#echo "$here"
 
 tmpFolder="$here/$INCLUDE/tmp"
 mkdir -p $tmpFolder
@@ -56,22 +56,22 @@ if [[ "$openvpn" = "true" && ! -d "$seedboxFiles/config/openvpn" ]]; then
 docker run -v $OVPN_DATA --rm -it kylemanna/openvpn easyrsa build-client-full \$1 nopass
 # Retrieve the client configuration with embedded certificates
 docker run -v $OVPN_DATA --rm kylemanna/openvpn ovpn_getclient \$1 > \$1.ovpn
-" > createVpnFor.sh 
+" > createVpnFor.sh
     chmod +x createVpnFor.sh
 fi
 
 
 function addProxy_pass {
 local  result="$1"
-result="$result                       if (\$remote_user = \"$4\") {\n"
-result="$result                             proxy_pass http://$2:$3;\n"
-result="$result                            break;\n              }\n"
+result="$result        if (\$remote_user = \"$4\") {\n"
+result="$result          proxy_pass http://$2:$3;\n"
+result="$result        break;\n        }\n"
 echo "$result"
 }
 function addCouchPotato {
 local  result="$1\n"
-result="$result couchPotato_$2:\n"
-result="$result    image: cloneme/couchpotato\n"
+result="$result couchpotato_$2:\n"
+result="$result    image: funtwo/couchpotato:latest-dev\n"
 result="$result    container_name: seedboxdocker_couchpotato_$2\n"
 result="$result    restart: always\n"
 result="$result    networks: \n"
@@ -84,26 +84,23 @@ result="$result        - #seedboxFolder#/downloads/:/torrents\n"
 
 echo "$result"
 }
-function delete {
-if [ "$2" = "true" ]; then
- sed -i "/#$1_end#/d" docker-compose.yml
- sed -i "/#$1_end#/d" nginx.conf
- echo "       - $1\n"
-else
-#Delete the lines starting from the pattern 'plex' till ,#plex_end#...
 
-  local l=$(grep -n " $1:" docker-compose.yml | grep -Eo '^[^:]+' )
-  if [ "$l" = "" ]; then
-   sed -i "/#$1_end#/d" docker-compose.yml
-  else
-   sed -i "$l,/#$1_end#/d" docker-compose.yml
+function delete {
+#Delete the lines starting from the pattern '#start_servicename' till #end_servicename
+if [ "$2" = "f" ]; then
+  local l=$(grep -n "#start_$1" docker-compose.yml | grep -Eo '^[^:]+' )
+  if [ "$l" != "" ]; then
+   sed -i "$l,/#end_$1/d" docker-compose.yml
   fi
-  l=$(grep -n "upstream $1" nginx.conf | grep -Eo '^[^:]+' )
-  if [ "$l" = "" ]; then
-   sed -i "/#$1_end#/d" nginx.conf
-  else
-   sed -i "$l,/#$1_end#/d" nginx.conf
-  fi
+
+  l=$(grep -n "#start_$1" nginx.conf | grep -Eo '^[^:]+' | head -1)
+  while [ "$l" != "" ]; do
+    # >&2 echo "q"
+    sed -i "$l,/#end_$1/d" nginx.conf
+    l=$(grep -n "#start_$1" nginx.conf | grep -Eo '^[^:]+' | head -1)
+  done
+else
+ echo "       - $1\n"
 fi
 }
 
@@ -137,10 +134,6 @@ It is not necessary to set username & password. Activate \"rtorrent\" and put fo
     Set userName & password
     Download file location: /downloads/rtorrent/$1/film
 
-You can add providers.
-For example, run git clone https://github.com/Snipees/couchpotato.providers.french
-Then copy t411 & cpasbien in $seedboxFiles/config/couchpotato_$1/custom_plugins
-	
 Plex
 Issue : Plex NEVER asks for authentication. Everybody can access to it :/
 nano $seedboxFiles/config/plex/Library/Application\ Support/Plex\ Media\ Server/Preferences.xml
@@ -155,34 +148,94 @@ mkdir -p help
 echo "
 Following services are deployed:
 " > help/URL.txt
-if [ "$filemanager" = "true" ]; then
+if [ "$portainer" = "true" ]; then
    echo "
-File manager
-$httpMode://files.$server_name
+portainer
+$httpMode://$server_name/portainer
 " >> help/URL.txt
 fi
 if [ "$rtorrent" = "true" ]; then
    echo "
 rtorrent
-$httpMode://rtorrent.$server_name
+$httpMode://$server_name/rtorrent
 " >> help/URL.txt
 fi
 if [ "$sickrage" = "true" ]; then
    echo "
 sickrage
-$httpMode://sickrage.$server_name
+$httpMode://$server_name/sickrage
 " >> help/URL.txt
 fi
-if [ "$couchPotato" = "true" ]; then
+if [ "$couchpotato" = "true" ]; then
    echo "
-couchPotato
-$httpMode://couchpotato.$server_name
+couchpotato
+$httpMode://$server_name/couchpotato
 " >> help/URL.txt
 fi
 if [ "$headphones" = "true" ]; then
    echo "
 headphones
-$httpMode://headphones.$server_name
+$httpMode://$server_name/headphones
+" >> help/URL.txt
+fi
+if [ "$plex" = "true" ]; then
+   echo "
+Plex
+$httpMode://$server_name/plex
+" >> help/URL.txt
+fi
+if [ "$emby" = "true" ]; then
+   echo "
+emby
+$httpMode://$server_name/emby
+" >> help/URL.txt
+fi
+if [ "$limbomedia" = "true" ]; then
+   echo "
+limbomedia
+$httpMode://$server_name/media
+" >> help/URL.txt
+fi
+if [ "$cloud" = "true" ]; then
+   echo "
+cloud
+$httpMode://$server_name/cloud
+" >> help/URL.txt
+fi
+if [ "$elfinder" = "true" ]; then
+   echo "
+cloud
+$httpMode://$server_name/elfinder
+" >> help/URL.txt
+fi
+if [ "$muximux" = "true" ]; then
+   echo "
+muximux
+$httpMode:/$server_name/muximux
+" >> help/URL.txt
+fi
+if [ "$glances" = "true" ]; then
+   echo "
+glances
+$httpMode://$server_name/glances
+" >> help/URL.txt
+fi
+if [ "$plexpy" = "true" ]; then
+   echo "
+plexpy
+$httpMode://$server_name/plexpy
+" >> help/URL.txt
+fi
+if [ "$syncthing" = "true" ]; then
+   echo "
+syncthing
+$httpMode://$server_name/syncthing
+" >> help/URL.txt
+fi
+if [ "$pureftpd" = "true" ]; then
+   echo "
+FTP
+ftp://$server_name
 " >> help/URL.txt
 fi
 if [ "$explorer" = "true" ]; then
@@ -191,28 +244,16 @@ explorer
 $httpMode://explorer.$server_name
 " >> help/URL.txt
 fi
-if [ "$plex" = "true" ]; then
+if [ "$filemanager" = "true" ]; then
    echo "
-Plex
-$httpMode://plex.$server_name/web/index.html
+File manager
+$httpMode://files.$server_name
 " >> help/URL.txt
 fi
-if [ "$emby" = "true" ]; then
+if [ "$butterfly" = "true" ]; then
    echo "
-emby
-$httpMode://emby.$server_name
-" >> help/URL.txt
-fi
-if [ "$limbomedia" = "true" ]; then
-   echo "
-limbomedia
-$httpMode://media.$server_name
-" >> help/URL.txt
-fi
-if [ "$pureftpd" = "true" ]; then
-   echo "
-FTP
-ftp://$server_name
+Web console
+$httpMode://$server_name/butterfly
 " >> help/URL.txt
 fi
 }
@@ -226,16 +267,16 @@ cp_ng_conf=""
 while IFS='' read -r line || [[ -n "$line" ]]; do
     #echo "Text read from file: $line"
     IFS=':' read -r userName string <<< "$line"
-	#sickrage
-	sickrage_conf=$(addProxy_pass "$sickrage_conf" "seedboxdocker_sickrage" "$web_port" "$userName")
-	web_port=$[$web_port+1]
-	#CouchPotato
-	if [ "$couchPotato" = "true" ]; then
-		cp_ng_conf=$(addProxy_pass "$cp_ng_conf" "seedboxdocker_couchpotato_$userName" "5050" "$userName")
-		cp_dc_conf=$(addCouchPotato "$cp_dc_conf" "$userName")
-		depends_on="$depends_on       - couchPotato_$userName\n"
-	fi
-	generateHelp "$userName"
+  #sickrage
+  sickrage_conf=$(addProxy_pass "$sickrage_conf" "seedboxdocker_sickrage" "$web_port" "$userName")
+  web_port=$[$web_port+1]
+  #CouchPotato
+  if [ "$couchpotato" = "true" ]; then
+    cp_ng_conf=$(addProxy_pass "$cp_ng_conf" "seedboxdocker_couchpotato_$userName" "5050" "$userName")
+    cp_dc_conf=$(addCouchPotato "$cp_dc_conf" "$userName")
+    depends_on="$depends_on       - couchpotato_$userName\n"
+  fi
+  generateHelp "$userName"
 done < "$users"
 generateURL
 
@@ -246,19 +287,28 @@ sed -i 's|#PLEX_USERNAME#|'"$plexUser"'|g' docker-compose.yml
 sed -i 's|#PLEX_PASSWORD#|'"$plexPass"'|g' docker-compose.yml
 
 #Delete undeployed servers
+depends_on="$depends_on$(delete "plexpy" $plexpy)"
 depends_on="$depends_on$(delete "plex" $plex)"
 depends_on="$depends_on$(delete "emby" $emby)"
 depends_on="$depends_on$(delete "limbomedia" $limbomedia)"
 depends_on="$depends_on$(delete "sickrage" $sickrage)"
 depends_on="$depends_on$(delete "rtorrent" $rtorrent)"
 depends_on="$depends_on$(delete "headphones" $headphones)"
-delete "couchPotato" $couchPotato > /dev/null
+delete "couchpotato" $couchpotato > /dev/null
 delete "openvpn" $openvpn > /dev/null
 delete "teamspeak" $teamspeak > /dev/null
-depends_on="$depends_on$(delete "explorer" $explorer)"
 delete "pureftpd" $pureftpd > /dev/null
-depends_on="$depends_on$(delete "filemanager" $filemanager)"
 delete "fail2ban" $fail2ban > /dev/null
+delete "subliminal" $subliminal > /dev/null
+depends_on="$depends_on$(delete "cloud" $cloud)"
+depends_on="$depends_on$(delete "explorer" $explorer)"
+depends_on="$depends_on$(delete "filemanager" $filemanager)"
+depends_on="$depends_on$(delete "syncthing" $syncthing)"
+depends_on="$depends_on$(delete "glances" $glances)"
+depends_on="$depends_on$(delete "muximux" $muximux)"
+depends_on="$depends_on$(delete "portainer" $portainer)"
+depends_on="$depends_on$(delete "elfinder" $elfinder)"
+depends_on="$depends_on$(delete "butterfly" $butterfly)"
 
 if [ "$depends_on" != "" ]; then
  depends_on="    depends_on: \n$depends_on"
@@ -270,6 +320,7 @@ sed -i 's|#frontend_dependencies#|'"$depends_on"'|g' docker-compose.yml
 sed -i "s|#plex_config#|$plex_config|g" docker-compose.yml
 sed -i "s|#emby_config#|$emby_config|g" docker-compose.yml
 sed -i "s|#headphones_config#|$headphones_config|g" docker-compose.yml
+sed -i "s|#mux_config#|$mux_config|g" docker-compose.yml
 
 if [[ "$headphones" = "true" && ! -f $seedboxFiles/config/headphones/headphones.ini ]]; then
  mkdir -p $seedboxFiles/config/headphones

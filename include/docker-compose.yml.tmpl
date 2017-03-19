@@ -21,8 +21,10 @@ services:
         - #pwd#/htpasswd.txt:/etc/nginx/.htpasswd:ro
         - #pwd#/nginx.conf:/etc/nginx/nginx.conf:ro
         - #seedboxFolder#/log/nginx-front:/var/log/nginx
+
+#start_rtorrent
  rtorrent:
-    image: cloneme/rtorrent-rutorrent:64bit
+    image: funtwo/rtorrent-rutorrent:64bit
     #build: ../rtorrent-rutorrent
     container_name: seedboxdocker_rtorrent_1
     restart: always
@@ -47,9 +49,11 @@ services:
         - #seedboxFolder#/downloads/:/downloads
 #The authentification is done by the container.
         - #seedboxFolder#/log/nginx-torrent:/var/log/nginx
-#rtorrent_end#
+#end_rtorrent
+
+#start_fail2ban
  fail2ban:
-    image: cloneme/fail2ban:latest
+    image: funtwo/fail2ban:latest-dev
     container_name: seedboxdocker_fail2ban
     restart: always
     privileged: true
@@ -63,10 +67,11 @@ services:
         - #pwd#/include/fail2ban/nginx-badbots.conf:/etc/fail2ban/filter.d/nginx-badbots.conf:ro
         - #seedboxFolder#/log:/var/log/
         - /var/log:/host
-#fail2ban_end#
+#end_fail2ban
 
+#start_sickrage
  sickrage:
-    image: cloneme/mu-sickrage
+    image: funtwo/sickrage:latest-dev
     container_name: seedboxdocker_sickrage
     restart: always
     networks: 
@@ -77,10 +82,13 @@ services:
         - #pwd#/htpasswd.txt:/etc/nginx/.htpasswd:ro
         - #seedboxFolder#/config/sickrage:/config
         - #seedboxFolder#/downloads/:/torrents
-#sickrage_end#
+#end_sickrage
 
+#start_couchpotato
  #couckPotato_conf#
+#end_couchpotato
 
+#start_plex
  plex:
     image: timhaak/plex
     container_name: seedboxdocker_plex_1
@@ -101,8 +109,9 @@ services:
 #uncomment the next line to test if it works on your side
 #plex_config#        - #seedboxFolder#/config/plex:/config
         - #seedboxFolder#/downloads/:/data
-#plex_end#
+#end_plex
 
+#start_emby
  emby:
     image: emby/embyserver
     container_name: emby
@@ -115,8 +124,9 @@ services:
     volumes:
 #emby_config#        - #seedboxFolder#/config/emby:/config
         - #seedboxFolder#/downloads/:/media
-#emby_end#
+#end_emby
 
+#start_limbomedia
  limbomedia:
     image: limbomedia/limbomedia
     container_name: limbomedia
@@ -125,8 +135,46 @@ services:
       - seedbox
     volumes:
         - #seedboxFolder#/downloads/:/data
-#limbomedia_end#
+#end_limbomedia
 
+#start_cloud
+ cloud:
+    image: coderaiser/cloudcmd
+    container_name: seedboxdocker_cloud
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - #seedboxFolder#/config/cloud:/root
+      - #seedboxFolder#/downloads:/mnt/fs
+#end_cloud
+
+#start_explorer
+ explorer:
+   image: cloneme/explorer
+   container_name: seedboxdocker_explorer_1
+   restart: always
+   networks:
+      - seedbox
+   volumes:
+       - #seedboxFolder#/config/explorer:/opt/explorer
+       - #seedboxFolder#/downloads:/torrents
+#end_explorer
+
+#start_filemanager
+ filemanager:
+    image: funtwo/filemanager:latest-dev
+    container_name: seedboxdocker_filemanager_1
+    restart: always
+    networks:
+      - seedbox
+    volumes:
+        - #pwd#/htpasswd.txt:/.userlist:ro
+        - #seedboxFolder#/downloads:/downloads
+#The authentification is done on front side.
+#end_filemanager
+
+#start_openvpn
  openvpn:
     image: kylemanna/openvpn
     container_name: seedboxdocker_openvpn_1
@@ -139,8 +187,9 @@ services:
         - #seedboxFolder#/config/openvpn:/etc/openvpn
     cap_add:
         - NET_ADMIN
-#openvpn_end#
+#end_openvpn
 
+#start_teamspeak
  teamspeak:
    image: devalx/docker-teamspeak3:latest
    container_name: seedboxdocker_teamspeak_1
@@ -155,19 +204,9 @@ services:
        - "10011:10011"
    volumes:
        - #seedboxFolder#/config/ts3:/home/ts3/data
-#teamspeak_end#
+#end_teamspeak
 
- explorer:
-   image: cloneme/explorer
-   container_name: seedboxdocker_explorer_1
-   restart: always
-   networks: 
-      - seedbox
-   volumes:
-       - #seedboxFolder#/config/explorer:/opt/explorer
-       - #seedboxFolder#/downloads:/torrents
-#explorer_end#
-
+#start_headphones
  headphones:
    image: pwntr/headphones-alpine
    container_name: seedboxdocker_headphones_1
@@ -180,19 +219,9 @@ services:
        - #seedboxFolder#/downloads/music:/music
    environment:
         - TZ=#TZ#
-#headphones_end#
+#end_headphones
 
- filemanager:
-    image: cloneme/filemanager
-    container_name: seedboxdocker_filemanager_1
-    restart: always
-    networks: 
-      - seedbox
-    volumes:
-        - #seedboxFolder#/downloads:/downloads
-#The authentification is done on front side.
-#filemanager_end#
-
+#start_pureftpd
  pureftpd:
     image: cloneme/pure-ftpd
     container_name: seedboxdocker_pureftpd_1
@@ -208,7 +237,129 @@ services:
     environment:
         - PUBLICHOST=#server_name#
         - TZ=#TZ#
-#pureftpd_end#
+#end_pureftpd
+
+#start_muximux
+ muximux:
+    image: linuxserver/muximux
+    container_name: seedboxdocker_muximux_1
+    restart: always
+    networks: 
+      - seedbox
+    environment:
+      - TZ=#TZ#
+#      - PGID=1000
+#      - PUID=1000
+#mux_config#    volumes:
+#mux_config#      - #seedboxFolder#/config/muximux:/config
+#end_muximux
+
+#start_glances
+ glances:
+    image: funtwo/glances:master
+    container_name: seedboxdocker_glances_1
+    restart: always
+    pid: host
+    networks: 
+      - seedbox
+#    ports:
+#      - "61208:61208"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - #seedboxFolder#/config:/data/config
+      - #seedboxFolder#/downloads:/data/downloads
+      - #seedboxFolder#/log:/data/log
+    environment:
+      - GLANCES_OPT=-w
+#end_glances
+
+#start_plexpy
+ plexpy:
+    image: linuxserver/plexpy
+    container_name: seedboxdocker_plexpy_1
+    restart: always
+    networks: 
+      - seedbox
+#    ports:
+#      - "8181:8181"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - #seedboxFolder#/config/plexpy:/config
+      - #seedboxFolder#/config/plex/Library/Application\040Support/Plex\040Media\040Server/Logs:/logs:ro
+#end_plexpy
+
+#start_syncthing
+ syncthing:
+    image: linuxserver/syncthing
+    container_name: seedboxdocker_syncthing_1
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - #seedboxFolder#/config/syncthing:/config
+      - #seedboxFolder#/downloads:/storage
+    environment:
+      - PGID=1000
+      - PUID=1000
+#    ports:
+#      - "8384:8384"
+#      - "22000:22000"
+#      - "21027:21027/udp"
+#end_syncthing
+
+#start_portainer
+ portainer:
+    image: portainer/portainer
+    container_name: seedboxdocker_portainer_1
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+#    ports:
+#      - "9000:9000"
+#end_portainer
+
+#start_elfinder
+ elfinder:
+    image: sebastianhutter/elfinder
+    container_name: seedboxdocker_elfinder_1
+    restart: always
+    networks: 
+      - seedbox
+    environment:
+      - ELFINDER_FILES_URI=/elfinder/files
+    volumes:
+      - #seedboxFolder#:/var/www/html/files
+#end_elfinder
+
+#start_subliminal
+ subliminal:
+    image: funtwo/subliminal:master
+    container_name: seedboxdocker_subliminal_1
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - #seedboxFolder#/downloads:/downloads
+      - #pwd#/htpasswd.txt:/etc/.htpasswd:ro
+      - #seedboxFolder#/log/subliminal:/var/log/subliminal
+#end_subliminal
+
+#start_butterfly
+ butterfly:
+    image: garland/butterfly
+    container_name: seedboxdocker_butterfly_1
+    restart: always
+    networks: 
+      - seedbox
+    environment:
+      - PORT=57575
+    volumes:
+      - #seedboxFolder#:/data
+#    ports:
+#      - "57575:57575"
+#end_butterfly
 
 networks:
   seedbox:
