@@ -177,6 +177,15 @@
     }
 #end_butterfly
 
+#start_radarr
+    location /radarr {
+        include auth-basic.conf;
+        proxy_pass http://seedboxdocker_radarr_1:7878;
+        include proxy.conf;
+    }
+#end_radarr
+
+
     location /nginx_status {
         stub_status on;
         access_log off;

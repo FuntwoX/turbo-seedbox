@@ -13,7 +13,7 @@ EMAIL="seedbox@yopmail.com"
 #see http://php.net/manual/en/timezones.php
 TZ="Europe/Paris"
 #using letsEncrypt, delete subdomains not defined on DNS side
-SUBDOMAINS="rtorrent,sickrage,couchpotato,plex,headphones,media,emby,muximux,glances,syncthing,plexpy,cloud,portainer"
+SUBDOMAINS="rtorrent,sickrage,couchpotato,plex,headphones,media,emby,muximux,glances,syncthing,plexpy,cloud,portainer,radarr"
 
 
 ############### SERVER
@@ -31,6 +31,7 @@ limbomedia=f
 
 sickrage=true
 couchpotato=true
+radarr=f
 rtorrent=true
 # https://mondedie.fr/viewtopic.php?id=7475
 # not yet multi users
@@ -43,7 +44,7 @@ openvpn=f
 # https://hub.docker.com/r/devalx/docker-teamspeak3/
 teamspeak=f
 # https://hub.docker.com/r/stilliard/pure-ftpd/
-pureftpd=true
+pureftpd=f
 
 #file explorer http://cloudcmd.io/
 cloud=f
@@ -61,7 +62,7 @@ glances=true
 syncthing=true
 
 #linuxserver/plexpy
-plexpy=true
+plexpy=f
 
 #docker web ui manager
 portainer=true
@@ -70,7 +71,7 @@ portainer=true
 subliminal=true
 
 #a web terminal
-butterfly=true
+butterfly=f
 
 #END SERVER
 

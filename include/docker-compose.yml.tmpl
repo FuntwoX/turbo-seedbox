@@ -328,6 +328,23 @@ services:
 #      - "57575:57575"
 #end_butterfly
 
+#start_radarr
+ radarr:
+    image: linuxserver/radarr
+    container_name: seedboxdocker_radarr_1
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - #seedboxFolder#/config/radarr:/config
+      - #seedboxFolder#/downloads:/storage
+    environment:
+      - PGID=1000
+      - PUID=1000
+#    ports:
+#      - "7878:7878"
+#end_radarr
+
 networks:
   seedbox:
     driver: bridge
