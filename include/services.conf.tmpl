@@ -187,7 +187,6 @@
 
 #start_jackett
     location /jackett {
-        include auth-basic.conf;
         proxy_pass http://seedboxdocker_jackett_1:9117;
         include proxy.conf;
     }
