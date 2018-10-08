@@ -244,6 +244,18 @@ FTP
 ftp://$server_name
 " >> help/URL.txt
 fi
+if [ "$jackett" = "true" ]; then
+   echo "
+jackett
+$httpMode://$server_name/jackett
+" >> help/URL.txt
+fi
+if [ "$radarr" = "true" ]; then
+   echo "
+radarr
+$httpMode://$server_name/radarr
+" >> help/URL.txt
+fi
 }
 
 sickrage_conf=""
@@ -295,6 +307,7 @@ depends_on="$depends_on$(delete "portainer" $portainer)"
 depends_on="$depends_on$(delete "elfinder" $elfinder)"
 depends_on="$depends_on$(delete "butterfly" $butterfly)"
 depends_on="$depends_on$(delete "radarr" $radarr)"
+depends_on="$depends_on$(delete "jackett" $jackett)"
 
 if [ "$depends_on" != "" ]; then
  depends_on="    depends_on: \n$depends_on"

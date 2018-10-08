@@ -73,6 +73,9 @@ subliminal=true
 #a web terminal
 butterfly=f
 
+#API Support for your favorite torrent trackers.
+jackett=true
+
 #END SERVER
 
 #set "#" if you have the following Error: 
