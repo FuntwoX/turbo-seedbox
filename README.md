@@ -2,7 +2,7 @@
 
 This project deploys a **multi-users** seedbox, using Docker. It will install docker automatically, if needed, and deploy following servers:
 - rtorrent: to download torrent.
-- sickrage: Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
+- sickchill: Automatic Video Library Manager for TV Shows. It watches for new episodes of your favorite shows, and when they are posted it does its magic.
 - couchpotato: same thing but for films.
 - headphones: same thing but for music.
 - plex, emby and limboserver: to stream videos from your server to your TV or laptop.
@@ -56,7 +56,7 @@ It will:
 
 
 ## 3. Configure your DNS
-Following subdomains are used: files, rtorrent, sickrage, couchpotato, headphones, explorer, emby, media.
+Following subdomains are used: files, rtorrent, sickchill, couchpotato, headphones, explorer, emby, media.
 If your DNS handle wildcards, you are lucky.
 Otherwise, you need to declare each subdomain.
 
@@ -104,7 +104,7 @@ And add (if the docker's IP is 192.168.99.100, run "docker-machine ip default" t
 192.168.99.100 rtorrent.dock
 192.168.99.100 files.dock
 192.168.99.100 plex.dock
-192.168.99.100 sickrage.dock
+192.168.99.100 sickchill.dock
 192.168.99.100 couchpotato.dock
 192.168.99.100 explorer.dock
 ```
@@ -112,7 +112,7 @@ Then you can access to servers using these urls:
 ```
 http://rtorrent.dock
 http://files.dock
-http://sickrage.dock
+http://sickchill.dock
 http://couchpotato.dock
 http://explorer.dock
 ```

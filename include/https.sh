@@ -25,7 +25,7 @@ fi
 
 . $tmpFolder/letsencrypt/config/donoteditthisfile.conf
 #use quotes to fix:
-#include/https.sh: line 29: [: files,rtorrent,sickrage,couchpotato,plex,explorer: unary operator expected
+#include/https.sh: line 29: [: files,rtorrent,sickchill,couchpotato,plex,explorer: unary operator expected
 if [ ! "$URL" = "$ORIGURL" ] || [ ! "$SUBDOMAINS" = "$ORIGSUBDOMAINS" ]; then
   echo "Different sub/domains entered than what was used before. Revoking and deleting existing certificate, and an updated one will be created"
   docker run -it --rm \

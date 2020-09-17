@@ -68,20 +68,24 @@ services:
         - /var/log:/host
 #end_fail2ban
 
-#start_sickrage
- sickrage:
-    image: funtwo/sickrage:latest-dev
-    container_name: seedboxdocker_sickrage
-    restart: always
+#start_sickchill
+ sickchill:
+    image: linuxserver/sickchill
+    container_name: seedboxdocker_sickchill
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/France
     networks: 
       - seedbox
-    mem_limit: 300m
-    memswap_limit: 500m
     volumes:
-        - #pwd#/htpasswd.txt:/etc/nginx/.htpasswd:ro
-        - #seedboxFolder#/config/sickrage:/config
+        - #seedboxFolder#/config/sickchill:/config
         - #seedboxFolder#/downloads/:/torrents
-#end_sickrage
+        - #seedboxFolder#/downloads/:/tv
+ports:
+      - 8081:8081
+#end_sickchill
 
 #start_couchpotato
  #couckPotato_conf#

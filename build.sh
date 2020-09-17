@@ -13,7 +13,7 @@ EMAIL="seedbox@yopmail.com"
 #see http://php.net/manual/en/timezones.php
 TZ="Europe/Paris"
 #using letsEncrypt, delete subdomains not defined on DNS side
-SUBDOMAINS="rtorrent,sickrage,couchpotato,plex,headphones,media,emby,muximux,glances,syncthing,plexpy,cloud,portainer,radarr"
+SUBDOMAINS="rtorrent,sickchill,couchpotato,plex,headphones,media,emby,muximux,glances,syncthing,plexpy,cloud,portainer,radarr"
 
 
 ############### SERVER
@@ -29,7 +29,7 @@ emby=f
 # login with admin / admin 
 limbomedia=f
 
-sickrage=true
+sickchill=true
 couchpotato=true
 radarr=f
 rtorrent=true

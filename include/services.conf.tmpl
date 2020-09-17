@@ -40,13 +40,13 @@
     }
 #end_rtorrent
 
-#start_sickrage 
-    location /sickrage {
+#start_sickchill
+    location /sickchill {
         include auth-basic.conf;
         include proxy.conf;
-        #sickrage_conf#
+        proxy_pass http://seedboxdocker_sickrage:8081;
     }
-#end_sickrage
+#end_sickchill
 
 #start_plex
     location /web {
