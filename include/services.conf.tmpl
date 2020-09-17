@@ -40,13 +40,13 @@
     }
 #end_rtorrent
 
-#start_sickrage 
-    location /sickrage {
+#start_sickchill
+    location /sickchill {
         include auth-basic.conf;
         include proxy.conf;
-        #sickrage_conf#
+        proxy_pass http://seedboxdocker_sickrage:8081;
     }
-#end_sickrage
+#end_sickchill
 
 #start_plex
     location /web {
@@ -176,6 +176,22 @@
     subs_filter location.pathname '"/"';
     }
 #end_butterfly
+
+#start_radarr
+    location /radarr {
+        include auth-basic.conf;
+        proxy_pass http://seedboxdocker_radarr_1:7878;
+        include proxy.conf;
+    }
+#end_radarr
+
+#start_jackett
+    location /jackett {
+        proxy_pass http://seedboxdocker_jackett_1:9117;
+        include proxy.conf;
+    }
+#end_jackett
+
 
     location /nginx_status {
         stub_status on;

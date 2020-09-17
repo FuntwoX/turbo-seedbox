@@ -69,20 +69,24 @@ services:
         - /var/log:/host
 #end_fail2ban
 
-#start_sickrage
- sickrage:
-    image: funtwo/sickrage:latest-dev
-    container_name: seedboxdocker_sickrage
-    restart: always
+#start_sickchill
+ sickchill:
+    image: linuxserver/sickchill
+    container_name: seedboxdocker_sickchill
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/France
     networks: 
       - seedbox
-    mem_limit: 300m
-    memswap_limit: 500m
     volumes:
-        - #pwd#/htpasswd.txt:/etc/nginx/.htpasswd:ro
-        - #seedboxFolder#/config/sickrage:/config
+        - #seedboxFolder#/config/sickchill:/config
         - #seedboxFolder#/downloads/:/torrents
-#end_sickrage
+        - #seedboxFolder#/downloads/:/tv
+ports:
+      - 8081:8081
+#end_sickchill
 
 #start_couchpotato
  #couckPotato_conf#
@@ -90,7 +94,7 @@ services:
 
 #start_plex
  plex:
-    image: timhaak/plex
+    image: plexinc/pms-docker
     container_name: seedboxdocker_plex_1
     restart: always
     networks: 
@@ -100,9 +104,9 @@ services:
     ports:
         - "32400:32400"
     environment:
+        - TZ=#TZ#
         - VIRTUAL_HOST=plex.dock
-        - PLEX_USERNAME=#PLEX_USERNAME#
-        - PLEX_PASSWORD=#PLEX_PASSWORD#
+        - PLEX_CLAIM=#PLEX_TOKEN#
     volumes:
 #Some users have the folliwing issue
 #Error: Unable to set up server: sqlite3_statement_backend::prepare: disk I/O error for SQL: PRAGMA cache_size=4000
@@ -322,7 +326,7 @@ services:
 
 #start_elfinder
  elfinder:
-    image: sebastianhutter/elfinder
+    image: sebastianhutter/elfinder:latest
     container_name: seedboxdocker_elfinder_1
     restart: always
     networks: 
@@ -360,6 +364,40 @@ services:
 #    ports:
 #      - "57575:57575"
 #end_butterfly
+
+#start_radarr
+ radarr:
+    image: linuxserver/radarr
+    container_name: seedboxdocker_radarr_1
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - #seedboxFolder#/config/radarr:/config
+      - #seedboxFolder#/downloads:/storage
+    environment:
+      - PGID=1000
+      - PUID=1000
+#    ports:
+#      - "7878:7878"
+#end_radarr
+
+#start_jackett
+ jackett:
+    image: linuxserver/jackett:development
+    container_name: seedboxdocker_jackett_1
+    restart: always
+    networks: 
+      - seedbox
+    volumes:
+      - #seedboxFolder#/config/jackett:/config
+      - #seedboxFolder#/downloads:/downloads
+    environment:
+      - PGID=1000
+      - PUID=1000
+#    ports:
+#      - "9117:9117"
+#end_jackett
 
 networks:
   seedbox:
