@@ -56,7 +56,7 @@ elfinder=true
 muximux=true
 
 # docker.io/nicolargo/glances
-glances=true
+glances=false
 
 # linuxserver/syncthing
 syncthing=true
